@@ -1,43 +1,77 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
+<html lang="pt-br"
+      xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width"/>
     <title>Lista de Convidados</title>
-    <!-- Última versão CSS compilada e minificada -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- Tema opcional -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- Última versão JavaScript compilada e minificada -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
 </head>
 <body>
 <div class="panel panel-default" style="margin: 10px">
     <div class="panel-heading">
-        <h1 class="panel-title">Lista de convidados</h1>
+        <h1 class="panel-title">Lista de Convidados</h1>
     </div>
     <div class="panel-body">
+        <form class="form-inline" method="POST" style="margin:20px 0"
+              th:action="@{/convidados}" th:object="${convidado}">
+            <div class="form-group">
+                <input type="text" class="form-control"
+                       placeholder="Nome" th:field="*{nome}"/>
+                <input type="number" class="form-control"
+                       placeholder="Acompanhantes"
+                       th:field="*{quantidade_acompanhantes}"/>
+                <button type="submit" class="btn btn-primary">Adicionar</button>
+            </div>
+        </form>
         <table class="table table-striped">
             <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Acompanhantes</th>
-            </tr>
+            <th>Nome</th>
+            <th>Acompanhantes</th>
+            <th>Ações</th>
             </thead>
             <tbody>
             <tr th:each="convidado : ${convidados}">
                 <td th:text="${convidado.nome}"></td>
-                <td th:text="${convidado.quantidadeAcompanhantes}"></td>
+                <td th:text="${convidado.quantidade_acompanhantes}"></td>
+                <td>
+                    <!-- Botão e Formulário de Atualização -->
+                    <button type="button" class="btn btn-info edit" data-id="${convidado.id}">Editar</button>
+                    <form id="editForm${convidado.id}" style="display:none;" th:action="@{'/convidados/' + ${convidado.id}}" method="post">
+                        <input type="text" th:name="nome" th:value="${convidado.nome}" class="form-control"/>
+                        <input type="number" th:name="quantidade_acompanhantes" th:value="${convidado.quantidade_acompanhantes}" class="form-control" min="0"/>
+                        <input type="hidden" name="_method" value="put" />
+                        <button type="submit" class="btn btn-success">Salvar</button>
+                        <button type="button" class="btn btn-secondary cancel">Cancelar</button>
+                    </form>
+
+                    <!-- Formulário de Exclusão -->
+                    <form th:action="@{'/convidados/' + ${convidado.id}}" method="delete" class="d-inline">
+                        <input type="hidden" name="_method" value="delete" />
+                        <button type="submit" class="btn btn-danger">Excluir</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
 </div>
-</body>
-
+<script>
+    $(document).ready(function() {
+        $('button.edit').click(function() {
+            var id = $(this).data('id');
+            $('#editForm' + id).show();
+        });
+    
+        $('button.cancel').click(function() {
+            $(this).closest('form').hide();
+        });
+    });
+    </script>
+<!--<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>-->
+<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 </body>
